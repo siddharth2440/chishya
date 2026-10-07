@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
@@ -42,3 +43,6 @@ class Image {
         }
 
 };
+
+
+Image load_image( const char* path );

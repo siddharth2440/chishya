@@ -18,7 +18,7 @@ void brightness_image( unsigned char* device_image, int pixel_count, int amount 
 
 int main() {
 
-    constexpr auto input_path = "assets/image.jpg";
+    constexpr auto input_path = "assets/image1.jpg";
     constexpr auto output_path = "assets/image_output.jpg";
 
     int width {};
