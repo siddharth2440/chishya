@@ -26,9 +26,13 @@ int main() {
     ImagePipeline pipeline{};
 
     pipeline.add( std::make_unique<GrayScale>() );
-    pipeline.add( std::make_unique<Invert>() );
+    // pipeline.add( std::make_unique<Invert>() );
     pipeline.add( std::make_unique<Brightness>(50) );
     pipeline.process( device_image );
+
+    device_image.download(image);
+
+    save_image( image, output_path );
 
     return EXIT_SUCCESS;
 

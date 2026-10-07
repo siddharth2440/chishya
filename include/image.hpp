@@ -46,3 +46,4 @@ class Image {
 
 
 Image load_image( const char* path );
+void save_image( const Image& image, const char* path );

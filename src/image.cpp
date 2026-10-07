@@ -1,6 +1,7 @@
 #include "image.hpp"
 #include "stdexcept"
 #include "stb/stb_image.h"
+#include "stb_image_write.h"
 
 Image load_image( const char* path ) {
     int width { 0 };
@@ -26,4 +27,18 @@ Image load_image( const char* path ) {
     stbi_image_free(raw);
 
     return image;
+}
+
+void save_image( const Image& image, const char* path ) {
+    const int width = static_cast<int>(image.width());
+    const int height = static_cast<int>(image.height());
+
+    const int channels = 3;
+    const int stride = width * channels;
+
+    const int result = stbi_write_png( path, width, height, channels, image.data(), stride);
+
+    if (!result) {
+        throw std::runtime_error("Failed to save image.");
+    }
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "image_op.hpp"
 
 class Invert final: public ImageOperation {
