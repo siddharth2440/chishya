@@ -6,3 +6,6 @@ build:
 
 run: build
 	./build/cuda_image
+
+test: build
+	./build/test_image
