@@ -11,19 +11,14 @@ __global__ void invert_kernel( Pixel* image, int pixel_count ) {
         return;
     }
 
-    const int index = pixel * 3;
-
     /*
         image_inversion_formula:  "new_value = 255 − old_value"
     */
-    image[ pixel ].r = 255 - image[index + 0].r;
-    image[ pixel ].g = 255 - image[index + 1].g;
-    image[ pixel ].b = 255 - image[index + 2].b;
+    image[pixel].r = 255 - image[pixel].r;
+    image[pixel].g = 255 - image[pixel].g;
+    image[pixel].b = 255 - image[pixel].b;
 
 }
-
-
-
 
 
 
@@ -37,7 +32,3 @@ void Invert::apply(DeviceImage& image) {
     cudaDeviceSynchronize();
 
 }
-
-
-
-

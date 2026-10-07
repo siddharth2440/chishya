@@ -10,8 +10,6 @@ __global__ void grayscale_kernel( Pixel* image, int pixel_count ) {
         return;
     }
 
-    const int idx = pixel * 3;
-
     const unsigned char r = image[pixel].r;
     const unsigned char g = image[pixel].g;
     const unsigned char b = image[pixel].b;

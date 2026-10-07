@@ -19,12 +19,15 @@ int main() {
 
     pipeline.add(std::make_unique<Invert>());
     pipeline.add(std::make_unique<GrayScale>());
-    pipeline.add(std::make_unique<Brightness>());
+    pipeline.add(std::make_unique<Brightness>(20));
 
     pipeline.process(device_img);
     device_img.download( img );
 
     const Pixel result = img.data()[0];
+    std::printf("Pipeline result: {%d, %d, %d}\n", result.r, result.g, result.b );
+
+    assert(result.r == 198);
 
     assert( result.r == 198 );
     assert( result.g == 198 );

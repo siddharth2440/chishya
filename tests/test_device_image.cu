@@ -1,7 +1,7 @@
 #include <iostream>
-
 #include <cassert>
-#include <device_image.hpp>
+
+#include "device_image.hpp"
 
 int main() {
 
