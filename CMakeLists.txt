@@ -49,12 +49,12 @@ target_include_directories(
 
 add_executable(
     test_device_image
-    tests/test_device.cu
+    tests/test_device_image.cu
     src/device_image.cu
 )
 
 target_include_directories(
-    cuda_image
+    test_device_image
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         /opt/cuda/include
@@ -69,7 +69,7 @@ add_executable(
 )
 
 target_include_directories(
-    cuda_image
+    test_invert
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         /opt/cuda/include
@@ -84,7 +84,7 @@ add_executable(
 )
 
 target_include_directories(
-    cuda_image
+    test_grayscale
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         /opt/cuda/include
@@ -109,6 +109,7 @@ target_include_directories(
 
 add_executable(
     test_image_pipeline
+    tests/test_image.pipeline.cu
     src/pipeline.cpp
     src/invert.cu
     src/grayscale.cu
@@ -121,9 +122,4 @@ target_include_directories(
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         /opt/cuda/include
-)
-
-
-set_target_properties(cuda_image PROPERTIES
-    CUDA_ARCHITECTURES native
 )
