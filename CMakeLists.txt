@@ -20,6 +20,7 @@ add_executable(
     src/invert.cu
     src/grayscale.cu
     src/brightness.cu
+    src/stb_image_write.cpp
 )
 
 target_include_directories(
@@ -38,6 +39,7 @@ add_executable(
     tests/test_image.cpp
     src/image.cpp
     src/stb_image.cpp
+    src/stb_image_write.cpp
 )
 
 target_include_directories(
