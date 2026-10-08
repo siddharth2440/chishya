@@ -1,6 +1,7 @@
 #include "image_op.hpp"
 #include "device_image.hpp"
 #include "invert.hpp"
+#include "cuda_check.hpp"
 
 #include <cuda_runtime.h>
 
@@ -27,8 +28,8 @@ void Invert::apply(DeviceImage& image) {
     constexpr int threads_per_block = 256;
     const int blocks = ( image.pixel_count() + threads_per_block - 1) / threads_per_block;
 
-    invert_kernel<<<blocks, threads_per_block>>>(image.data(), image.pixel_count());
+    invert_kernel<<<blocks, threads_per_block, 0, image.stream()>>>(image.data(), image.pixel_count());
 
-    cudaDeviceSynchronize();
-
+    cuda_check( cudaGetLastError(), "invert kernel launch" );
+    // cuda_check( cudaDeviceSynchronize(), "invert kernel execution" );
 }

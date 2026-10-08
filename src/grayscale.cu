@@ -1,5 +1,6 @@
 #include "grayscale.hpp"
 #include "device_image.hpp"
+#include "cuda_check.hpp"
 
 #include <cuda_runtime.h>
 
@@ -29,7 +30,9 @@ void GrayScale::apply( DeviceImage& image ) {
     constexpr int threads_per_block = 256;
     const int blocks = (image.pixel_count() + threads_per_block - 1) / threads_per_block;
 
-    grayscale_kernel<<<blocks, threads_per_block>>>(image.data(), image.pixel_count());
+    grayscale_kernel<<<blocks, threads_per_block, 0, image.stream()>>>(image.data(), image.pixel_count());
 
-    cudaDeviceSynchronize();
+    cuda_check( cudaGetLastError(), "Grayscale kernel launch" );   
+    // cuda_check(cudaDeviceSynchronize(), "Grayscale kernel execution" );
+
 }
