@@ -1,5 +1,6 @@
 #include "brightness.hpp"
 #include "device_image.hpp"
+#include "cuda_check.hpp"
 
 __global__ void brightness_kernel( Pixel* image, int pixel_count, int amout ) {
     const std::size_t pixel = blockIdx.x * blockDim.x + threadIdx.x;
@@ -31,7 +32,8 @@ void Brightness::apply( DeviceImage& device_image ) {
 
     const int blocks = ( device_image.pixel_count()  + threads_per_block - 1 ) / threads_per_block ;
 
-    brightness_kernel<<< blocks, threads_per_block >>>( device_image.data(), pixel_count , amount_ );
+    brightness_kernel<<< blocks, threads_per_block, 0, device_image.stream() >>>( device_image.data(), pixel_count , amount_ );
 
-    cudaDeviceSynchronize();
+    cuda_check(cudaGetLastError(), "Brightness kernel execution");
+    // cuda_check(cudaDeviceSynchronize(), "Brightness kernel execution");
 }

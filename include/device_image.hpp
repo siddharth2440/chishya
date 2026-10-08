@@ -2,6 +2,7 @@
 
 #include "image.hpp"
 #include <cstddef>
+#include <cuda_runtime.h>
 
 class DeviceImage {
 
@@ -29,9 +30,13 @@ class DeviceImage {
 
         [[nodiscard]]
         Pixel* data() noexcept;
+
+        cudaStream_t stream() const noexcept;
+
     
     private:
         std::size_t width_;
         std::size_t height_;
         Pixel* data_;
+        cudaStream_t stream_;
 };

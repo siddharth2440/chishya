@@ -1,12 +1,13 @@
 
 #include "cuda_runtime.h"
 #include <stdexcept>
-
+#include "cuda_check.hpp"
 #include "device_image.hpp"
 
 DeviceImage::DeviceImage( const Image& image )
     : width_{ image.width() }, height_{ image.height() }, data_{ nullptr } {
 
+        cuda_check( cudaStreamCreate( &stream_ ), "cudaStream create" );
         const std::size_t bytes = image.width() * image.height() * sizeof(Pixel);
 
         const cudaError_t result = cudaMalloc( reinterpret_cast<void**>(&data_), bytes );
@@ -15,21 +16,29 @@ DeviceImage::DeviceImage( const Image& image )
             throw std::runtime_error( cudaGetErrorString(result) );
         }
 
-       const cudaError_t copy_result = cudaMemcpy( data_, image.data(), bytes, cudaMemcpyHostToDevice);
-       if ( copy_result != cudaSuccess ) {
-        throw std::runtime_error( cudaGetErrorString(copy_result) );
-       }
+        cuda_check(cudaMemcpyAsync( data_, image.data(), bytes, cudaMemcpyHostToDevice, stream_ ), "cudaMemcpyAsync HostToDevice");
+        cuda_check(cudaStreamSynchronize( stream_ ), "cudaStreamSynchronize stream_");
+
+        // const cudaError_t copy_result = cudaMemcpy( data_, image.data(), bytes, cudaMemcpyHostToDevice);
+        // if ( copy_result != cudaSuccess ) {
+        //  throw std::runtime_error( cudaGetErrorString(copy_result) );
+        // }
 }
 
 DeviceImage::~DeviceImage() {
     if (data_) {
         cudaFree(data_);
     }
+
+    if (stream_) {
+        cudaStreamDestroy(stream_);
+    }
 }
 
 DeviceImage::DeviceImage(DeviceImage&& other) noexcept
-    : width_{ other.width() }, height_{ other.height() }, data_{ other.data_ } {
+    : width_{ other.width() }, height_{ other.height() }, data_{ other.data_ }, stream_(other.stream_) {
         other.data_ = nullptr;
+        other.stream_ = nullptr;
 }
 
 DeviceImage& DeviceImage::operator=(DeviceImage&& other) noexcept {
@@ -41,11 +50,18 @@ DeviceImage& DeviceImage::operator=(DeviceImage&& other) noexcept {
         cudaFree(data_);
     }
 
+    if (stream_) {
+        cudaStreamDestroy(stream_);
+    }
+    
+
     width_ = other.width_;
     height_ = other.height_;
     data_ = other.data_;
+    stream_ = other.stream_;
 
     other.data_ = nullptr;
+    other.stream_ = nullptr;
 
     return *this;
 }
@@ -57,6 +73,9 @@ void DeviceImage::download( Image& image ) const {
 
     const std::size_t bytes = width_ * height_ * sizeof(Pixel);    
     const cudaError_t result = cudaMemcpy( image.data(), data_, bytes, cudaMemcpyDeviceToHost );
+
+    cuda_check( cudaMemcpyAsync( image.data(), data_, bytes, cudaMemcpyDeviceToHost, stream_ ), "cudaMemcpy DeviceToHost" );
+    cuda_check( cudaStreamSynchronize( stream_ ), "download" );
 
     if (result != cudaSuccess) {
         throw std::runtime_error(cudaGetErrorString(result));
@@ -78,4 +97,9 @@ std::size_t DeviceImage::pixel_count() const noexcept {
 
 Pixel* DeviceImage::data() noexcept {
     return data_;
+}
+
+
+cudaStream_t DeviceImage::stream() const noexcept {
+    return stream_;
 }
